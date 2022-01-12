@@ -13,7 +13,7 @@ import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.ode.FirstOrderDifferentialEquations;
 
-public class Def_Track implements FirstOrderDifferentialEquations {
+public class FormationTrack implements FirstOrderDifferentialEquations {
 
 	int N;
 	int m;
@@ -26,7 +26,7 @@ public class Def_Track implements FirstOrderDifferentialEquations {
 	RealMatrix neBiPi;
 	RealMatrix nFL;
 
-	public Def_Track(int N, int m, RealMatrix Ai, RealMatrix Bi, RealMatrix Pi,
+	public FormationTrack(int N, int m, RealMatrix Ai, RealMatrix Bi, RealMatrix Pi,
 			RealMatrix Fi, double epsilon, RealMatrix Lg) {
 		this.N = N;
 		this.m = m;

@@ -19,7 +19,6 @@ import astarplanner.AStarVelocityPlanner;
 @SuppressWarnings("serial")
 public class Simulator extends JPanel {
 	public Map map;
-	public boolean DrawGrid = false;
 	AStarVelocityPlanner VelocityPlanner;
 	List<Node> VelocityProfile;
 	boolean velocityPlanningEnabled = false;
@@ -36,9 +35,8 @@ public class Simulator extends JPanel {
 	}
 
 	public void velocityPlan() {
-		if (velocityPlanningEnabled) {
+		if (velocityPlanningEnabled)
 			checkVelocityReplan();
-		}
 	}
 
 	public int[] getCurrentLocation() {
@@ -56,10 +54,7 @@ public class Simulator extends JPanel {
 		super.paint(g);
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.setBackground(Color.white);
-		// draw the grid
-		if (DrawGrid)
-			drawGrid(g2d);
-
+		
 		// draw the obstacles
 		for (var obstacle : map.getObstacles())
 			obstacle.draw(g2d);
@@ -67,21 +62,6 @@ public class Simulator extends JPanel {
 		// draw the robots
 		for (var robot : map.getRobots())
 			robot.draw(g2d);
-	}
-
-	private void drawGrid(Graphics2D g2d) {
-		int mapCellSize = map.getCellSize();
-		if (mapCellSize<= 0)
-			return;
-		g2d.setColor(Color.BLACK);
-		int paneWidth = this.getWidth();
-		int paneHeight = this.getHeight();
-		for (int i = 0; i < paneWidth; i += mapCellSize) {
-			g2d.drawLine(i, 0, i, paneHeight);
-		}
-		for (int j = 0; j < paneHeight; j += mapCellSize) {
-			g2d.drawLine(0, j, paneWidth, j);
-		}
 	}
 
 	int currentNodeIndex;
