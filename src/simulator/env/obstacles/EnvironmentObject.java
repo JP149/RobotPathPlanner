@@ -3,7 +3,7 @@
  * Professor Yi Guo
 @Author Jaydeep Patel 2013
 **/
-package simulator;
+package simulator.env.obstacles;
 
 import java.awt.Color;
 import java.awt.Graphics2D;

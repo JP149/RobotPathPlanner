@@ -3,29 +3,29 @@
  * Professor Yi Guo
 @Author Jaydeep Patel 2013
 **/
-package VelocityPlanningSimulation;
+package main;
 
 import java.awt.Color;
 import java.awt.Point;
 
 import javax.swing.JFrame;
 
-import simulator.CircularObstacle;
-import simulator.RectangularObstacle;
-import simulator.Robot;
 import simulator.Simulator;
+import simulator.env.obstacles.CircularObstacle;
+import simulator.env.obstacles.RectangularObstacle;
+import simulator.env.obstacles.Robot;
 
-public class NoVelocityPlanningMain {
+public class VelocityPlanningMain {
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-
 		Simulator sim = new Simulator();
-		sim.map.CellSize = 2;
-		sim.map.Height = 350;
-		sim.map.Width = 550;
+		sim.map.setCellSize(2);
+		sim.map.setHeight(350);
+		sim.map.setWidth(550);
+		
 		// define and add the robots
 		Point r1s = new Point(30, 75);
 		Point r2s = new Point(30, 150);
@@ -53,9 +53,9 @@ public class NoVelocityPlanningMain {
 		r2.Color = Color.GREEN;
 		r3.Color = Color.BLUE;
 
-		sim.map.Robots.add(r1);
-		sim.map.Robots.add(r2);
-		sim.map.Robots.add(r3);
+		sim.map.addObstacle(r1);
+		sim.map.addObstacle(r2);
+		sim.map.addObstacle(r3);
 
 		// create and add the obstacles
 		double staticVelocity = 0;
@@ -66,30 +66,18 @@ public class NoVelocityPlanningMain {
 		CircularObstacle co1 = new CircularObstacle(new Point(400, 150), 27,
 				staticVelocity);
 
-		// // (Default color is gray)
-		// //ro1 known static obstacle
-		// r1.processKnownObject(ro1);
-		// r2.processKnownObject(ro1);
-		// r3.processKnownObject(ro1);
-		//
-		// //ro2 known static obstacle
-		// r1.processKnownObject(ro2);
-		// r2.processKnownObject(ro2);
-		// r3.processKnownObject(ro2);
-		//
-		// //co1 unknown
+		// //perform the planning
+		sim.map.addObstacle(ro1);
+		sim.map.addObstacle(ro2);
+		sim.map.addObstacle(co1);
 
-		sim.map.Obstacles.add(ro1);
-		sim.map.Obstacles.add(ro2);
-		sim.map.Obstacles.add(co1);
-
-		// sim.enableVelocityPlanning();// do initial velocity replanning
-		// sim.velocityPlan();
+		sim.enableVelocityPlanning();// do initial velocity replanning
+		sim.velocityPlan();
 
 		// create a window and display the simulator (which is a JPanel)
-		JFrame frame = new JFrame("D* Lite Path Planning");
+		JFrame frame = new JFrame("Velocity Path Planning");
 		frame.add(sim);
-		frame.setSize(sim.map.Width, sim.map.Height);
+		frame.setSize(sim.map.getWidth(), sim.map.getHeight());
 		frame.setVisible(true);
 		// frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		sim.run();

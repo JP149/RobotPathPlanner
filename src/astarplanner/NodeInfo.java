@@ -3,7 +3,7 @@
  * Professor Yi Guo
 @Author Jaydeep Patel 2013
 **/
-package A_Star_Planner;
+package astarplanner;
 
 @SuppressWarnings({ "serial", "rawtypes" })
 public class NodeInfo implements Comparable, java.io.Serializable {

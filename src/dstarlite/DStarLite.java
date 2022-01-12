@@ -1,4 +1,4 @@
-package DStarLite;
+package dstarlite;
 
 import java.util.ArrayList;
 import java.util.HashMap;

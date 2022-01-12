@@ -8,31 +8,29 @@ package simulator;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JPanel;
 
-import A_Star_Planner.Node;
-import A_Star_Planner.VelocityPlanner_A_Star;
+import astarplanner.Node;
+import simulator.env.obstacles.Robot;
+import astarplanner.AStarVelocityPlanner;
 
 @SuppressWarnings("serial")
 public class Simulator extends JPanel {
 	public Map map;
 	public boolean DrawGrid = false;
-	VelocityPlanner_A_Star VelocityPlanner;
+	AStarVelocityPlanner VelocityPlanner;
 	List<Node> VelocityProfile;
 	boolean velocityPlanningEnabled = false;
 	boolean velocityProfiled = false;
 
 	public Simulator() {
-		ArrayList<Robot> Robots = new ArrayList<Robot>();
-		ArrayList<EnvironmentObject> Obstacles = new ArrayList<EnvironmentObject>();
-		map = new Map(Obstacles, Robots);
+		map = new Map();
 	}
 
 	public void enableVelocityPlanning() {
-		VelocityPlanner = new VelocityPlanner_A_Star(map.Robots);
+		VelocityPlanner = new AStarVelocityPlanner(map.getRobots());
 		velocityPlanningEnabled = true;
 		velocityProfiled = false;
 	}
@@ -63,26 +61,25 @@ public class Simulator extends JPanel {
 			drawGrid(g2d);
 
 		// draw the obstacles
-		int size = map.Obstacles.size();
-		for (int i = 0; i < size; i++)
-			map.Obstacles.get(i).draw(g2d);
-
+		for (var obstacle : map.getObstacles())
+			obstacle.draw(g2d);
+		
 		// draw the robots
-		size = map.Robots.size();
-		for (int i = 0; i < size; i++)
-			map.Robots.get(i).draw(g2d);
+		for (var robot : map.getRobots())
+			robot.draw(g2d);
 	}
 
 	private void drawGrid(Graphics2D g2d) {
-		if (map.CellSize <= 0)
+		int mapCellSize = map.getCellSize();
+		if (mapCellSize<= 0)
 			return;
 		g2d.setColor(Color.BLACK);
 		int paneWidth = this.getWidth();
 		int paneHeight = this.getHeight();
-		for (int i = 0; i < paneWidth; i += map.CellSize) {
+		for (int i = 0; i < paneWidth; i += mapCellSize) {
 			g2d.drawLine(i, 0, i, paneHeight);
 		}
-		for (int j = 0; j < paneHeight; j += map.CellSize) {
+		for (int j = 0; j < paneHeight; j += mapCellSize) {
 			g2d.drawLine(0, j, paneWidth, j);
 		}
 	}
@@ -98,10 +95,9 @@ public class Simulator extends JPanel {
 	}
 
 	private void stepRobot() {
-		for (int i = 0; i < map.Robots.size(); i++) {
-			Robot r = map.Robots.get(i);
-			r.checkReplan(map.Obstacles);
-			r.step();
+		for (Robot robot : map.getRobots()) {
+			robot.checkReplan(map.getObstacles());
+			robot.step();
 		}
 	}
 
@@ -112,7 +108,7 @@ public class Simulator extends JPanel {
 	}
 
 	private void checkVelocityReplan() {
-		if (!plannedAtLeastOnce(map.Robots)) {
+		if (!plannedAtLeastOnce(map.getRobots())) {
 			// initial planning required
 			planAllRobots();
 			VelocityProfile = VelocityPlanner.replan();
@@ -123,9 +119,9 @@ public class Simulator extends JPanel {
 			return;
 		}
 		// check if replanning is required
-		for (int i = 0; i < map.Robots.size(); i++) {
-			Robot r = map.Robots.get(i);
-			boolean robotReplanned = r.checkReplan(map.Obstacles);
+		
+		for (Robot r : map.getRobots()) {
+			boolean robotReplanned = r.checkReplan(map.getObstacles());
 			if (robotReplanned) {// now Velocity replan
 				VelocityProfile = VelocityPlanner.replan();
 				velocityProfiled = true;
@@ -148,7 +144,7 @@ public class Simulator extends JPanel {
 	}
 
 	private void planAllRobots() {
-		for (Robot r : map.Robots)
+		for (Robot r : map.getRobots())
 			r.replan();
 	}
 
@@ -165,7 +161,7 @@ public class Simulator extends JPanel {
 														// do
 			return;
 		currentNode = VelocityProfile.get(nextIndex);
-		for (Robot r : map.Robots)
+		for (Robot r : map.getRobots())
 			r.stepTo(currentNode.NodeInfo.Location[VelocityPlanner.getIndex(r)]);
 	}
 

@@ -3,7 +3,7 @@
  * Professor Yi Guo
 @Author Jaydeep Patel 2013
 **/
-package simulator;
+package simulator.env.obstacles;
 
 import java.awt.AlphaComposite;
 import java.awt.FontMetrics;
@@ -13,10 +13,12 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import DStarLite.DStarLite;
-import DStarLite.State;
+import dstarlite.DStarLite;
+import dstarlite.State;
+import simulator.Map;
 
 public class Robot extends EnvironmentObject {
+	
 	public int Radius;
 	public int SensingRange = 70;
 	public Point Start;
@@ -28,6 +30,7 @@ public class Robot extends EnvironmentObject {
 	public boolean IsReplanning = false;
 	public ArrayList<EnvironmentObject> knownObstacles;
 	DStarLite PathPlanner;
+	
 	public Map Map;
 	public boolean DisplaySensingRange = true;
 	public boolean hasPlannedOnce = false;
@@ -51,10 +54,10 @@ public class Robot extends EnvironmentObject {
 		this.Map = map;
 		PathPlanner = new DStarLite();
 		currentState = new State();
-		currentState.x = Start.x / Map.CellSize;
-		currentState.y = Start.y / Map.CellSize;
-		PathPlanner.init(currentState.x, currentState.y, Goal.x / Map.CellSize,
-				Goal.y / Map.CellSize);
+		currentState.x = Start.x / Map.getCellSize();
+		currentState.y = Start.y / Map.getCellSize();
+		PathPlanner.init(currentState.x, currentState.y, Goal.x / Map.getCellSize(),
+				Goal.y / Map.getCellSize());
 
 		this.Path = new ArrayList<State>();
 		this.previousPaths = new ArrayList<List<State>>();
@@ -148,6 +151,8 @@ public class Robot extends EnvironmentObject {
 	}
 
 	private void updateCells(EnvironmentObject eo) {
+		int mapCellSize = Map.getCellSize();
+		
 		if (eo instanceof RectangularObstacle) {
 			RectangularObstacle ro = (RectangularObstacle) eo;
 			// expand the Obstacle by the robot size
@@ -156,11 +161,12 @@ public class Robot extends EnvironmentObject {
 			// update blocked cells in the rectangle
 			int xOffset = ro.Location.x - ro.XSpan / 2;
 			int yOffset = ro.Location.y - ro.YSpan / 2;
-			for (int i = 0; i < ro.XSpan; i += Map.CellSize)
-				for (int j = 0; j < ro.YSpan; j += Map.CellSize)
+			
+			for (int i = 0; i < ro.XSpan; i += mapCellSize)
+				for (int j = 0; j < ro.YSpan; j += mapCellSize)
 					if (ro.isInObstacle(xOffset + i, yOffset + j))
-						PathPlanner.updateCell((xOffset + i) / Map.CellSize,
-								(yOffset + j) / Map.CellSize, -1);
+						PathPlanner.updateCell((xOffset + i) / mapCellSize,
+								(yOffset + j) / mapCellSize, -1);
 
 		} else if (eo instanceof CircularObstacle) {
 			CircularObstacle co = (CircularObstacle) eo;
@@ -170,14 +176,14 @@ public class Robot extends EnvironmentObject {
 			// update blocked cells in the Circle
 			int xOffset = co.Location.x - co.Radius;
 			int yOffset = co.Location.y - co.Radius;
-			for (int i = 0; i < 2 * co.Radius; i += Map.CellSize)
-				for (int j = 0; j < 2 * co.Radius; j += Map.CellSize)
+			for (int i = 0; i < 2 * co.Radius; i += mapCellSize)
+				for (int j = 0; j < 2 * co.Radius; j += mapCellSize)
 					if (co.isInObstacle(xOffset + i, yOffset + j))
-						PathPlanner.updateCell((xOffset + i) / Map.CellSize,
-								(yOffset + j) / Map.CellSize, -1);
+						PathPlanner.updateCell((xOffset + i) / mapCellSize,
+								(yOffset + j) / mapCellSize, -1);
 		} else {// Point Obstacle
-			PathPlanner.updateCell(eo.Location.x / Map.CellSize, eo.Location.y
-					/ Map.CellSize, -1);
+			PathPlanner.updateCell(eo.Location.x / mapCellSize, eo.Location.y
+					/ mapCellSize, -1);
 		}
 	}
 
@@ -200,10 +206,11 @@ public class Robot extends EnvironmentObject {
 		ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.12f);
 		g.setComposite(ac);
 		g.setColor(this.Color.darker());
+		int mapCellSize = Map.getCellSize();
 		for (List<State> path : previousPaths)
 			for (State s : path)
-				g.fillRect(s.x * Map.CellSize, s.y * Map.CellSize,
-						Map.CellSize, Map.CellSize);
+				g.fillRect(s.x * mapCellSize, s.y * mapCellSize,
+						mapCellSize, mapCellSize);
 
 		ac = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.65f);
 		g.setComposite(ac);
@@ -211,8 +218,8 @@ public class Robot extends EnvironmentObject {
 		g.setColor(this.Color.brighter());
 		// draw the new Path
 		for (State s : Path)
-			g.fillRect(s.x * Map.CellSize, s.y * Map.CellSize, Map.CellSize,
-					Map.CellSize);
+			g.fillRect(s.x * mapCellSize, s.y * mapCellSize, mapCellSize,
+					mapCellSize);
 
 		ac = AlphaComposite.getInstance(AlphaComposite.SRC);
 		g.setComposite(ac);
@@ -225,9 +232,7 @@ public class Robot extends EnvironmentObject {
 		FontMetrics fm = g.getFontMetrics();
 		Rectangle2D rect = fm.getStringBounds(this.Label, g);
 		g.setColor(java.awt.Color.white);
-		String labelString = this.Label;
-		if (this.IsReplanning)
-			labelString += " Replanning...";
+		
 		g.drawString(this.Label, this.Location.x - (float) rect.getWidth() / 2,
 				this.Location.y - (float) rect.getHeight() / 2 + fm.getAscent());
 
@@ -283,7 +288,8 @@ public class Robot extends EnvironmentObject {
 	public void stepTo(State s) {
 		currentState = s;
 		// step to the specified pathState
-		this.Location.x = s.x * Map.CellSize + Map.CellSize / 2;
-		this.Location.y = s.y * Map.CellSize + Map.CellSize / 2;
+		int mapCellSize = Map.getCellSize();
+		this.Location.x = s.x * mapCellSize + mapCellSize / 2;
+		this.Location.y = s.y * mapCellSize + mapCellSize / 2;
 	}
 }

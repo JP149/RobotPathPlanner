@@ -3,7 +3,7 @@
  * Professor Yi Guo
 @Author Jaydeep Patel 2013
  **/
-package Main;
+package main;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -21,7 +21,7 @@ public class Main extends JFrame implements ActionListener {
 
 		@Override
 		public void run() {
-			VelocityPlanningSimulation.NoVelocityPlanningMain.main(null);
+			main.NoVelocityPlanningMain.main(null);
 		}
 	}
 
@@ -29,7 +29,7 @@ public class Main extends JFrame implements ActionListener {
 
 		@Override
 		public void run() {
-			VelocityPlanningSimulation.Main.main(null);
+			main.VelocityPlanningMain.main(null);
 		}
 	}
 
@@ -37,7 +37,7 @@ public class Main extends JFrame implements ActionListener {
 
 		@Override
 		public void run() {
-			CoopFormationControlSimulation.Main.main(null);
+			main.FormationSimulationMain.main(null);
 		}
 	}
 

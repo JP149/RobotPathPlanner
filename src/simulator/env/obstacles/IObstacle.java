@@ -3,7 +3,7 @@
  * Professor Yi Guo
 @Author Jaydeep Patel 2013
 **/
-package simulator;
+package simulator.env.obstacles;
 
 public interface IObstacle {
 	boolean isInObstacle(int x,int y);

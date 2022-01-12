@@ -3,10 +3,11 @@
  * Professor Yi Guo
 @Author Jaydeep Patel 2013
 **/
-package CoopFormationControlSimulation;
+package main;
 
 import java.awt.Color;
 import java.awt.Point;
+import java.util.ArrayList;
 
 import javax.swing.JFrame;
 
@@ -18,10 +19,12 @@ import org.apache.commons.math3.ode.nonstiff.DormandPrince853Integrator;
 import org.apache.commons.math3.ode.sampling.StepHandler;
 import org.apache.commons.math3.ode.sampling.StepInterpolator;
 
-import simulator.Robot;
-import DStarLite.State;
+import dstarlite.State;
+import formationsimulation.Def_Track;
+import formationsimulation.FormationSimulator;
+import simulator.env.obstacles.Robot;
 
-public class Main {
+public class FormationSimulationMain {
 
 	public static void main(String[] args) {
 		RealMatrix Ai = MatrixUtils.createRealMatrix(new double[][] { { 0, 1 },
@@ -55,9 +58,9 @@ public class Main {
 				0.1, 0.25, 0.25 };
 
 		final FormationSimulator sim = new FormationSimulator();
-		sim.map.CellSize = 1;
-		sim.map.Height = 350;
-		sim.map.Width = 350;
+		sim.map.setCellSize(1);
+		sim.map.setHeight(350);
+		sim.map.setWidth(350);
 		// define and add the robots
 
 		// map positions -1.5, 1.5 to 0,300 for drawing
@@ -90,12 +93,13 @@ public class Main {
 		r4.Color = Color.BLACK;
 		r5.Color = Color.CYAN;
 
-		sim.map.Robots.add(r1);
-		sim.map.Robots.add(r2);
-		sim.map.Robots.add(r3);
-		sim.map.Robots.add(r4);
-		sim.map.Robots.add(r5);
-		for (Robot r : sim.map.Robots) {
+		sim.map.addObstacle(r1);
+		sim.map.addObstacle(r2);
+		sim.map.addObstacle(r3);
+		sim.map.addObstacle(r4);
+		sim.map.addObstacle(r5);
+		
+		for (Robot r : sim.map.getRobots()) {
 			r.DisplaySensingRange = false;
 			r.Radius = 10;
 		}
@@ -110,8 +114,12 @@ public class Main {
 				// current numeric solution to error
 				double[] E = interpolator.getInterpolatedState();
 
-				for (int i = 0; i < sim.map.Robots.size(); i++) {
-					Robot r = sim.map.Robots.get(i);
+				
+				ArrayList<Robot> robots =  sim.map.getRobots();
+				
+				for (int i = 0; i < robots.size(); i++) {
+					Robot r = robots.get(i);
+					
 					double x = Math.cos(t) + d[2 * i] * (-Math.sin(t))
 							+ d[2 * i + 1] * Math.cos(t) + E[2 * i];
 					double y = Math.sin(t) + d[2 * i] * Math.cos(t)
@@ -134,7 +142,7 @@ public class Main {
 		// create a window and display the simulator (which is a JPanel)
 		JFrame frame = new JFrame("Cooperative Formation Control");
 		frame.add(sim);
-		frame.setSize(sim.map.Width, sim.map.Height);
+		frame.setSize(sim.map.getWidth(), sim.map.getHeight());
 		frame.setVisible(true);
 		// frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		dp853.integrate(ode, 0.0, E0arr, 100.0, E);// solution from t=0 to t=100

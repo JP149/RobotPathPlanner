@@ -3,7 +3,7 @@
  * Professor Yi Guo
 @Author Jaydeep Patel 2013
 **/
-package CoopFormationControlSimulation;
+package formationsimulation;
 
 import simulator.Simulator;
 

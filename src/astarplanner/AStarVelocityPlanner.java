@@ -3,7 +3,7 @@
  * Professor Yi Guo
 @Author Jaydeep Patel 2013
 **/
-package A_Star_Planner;
+package astarplanner;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,10 +11,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
 
-import simulator.Robot;
-import DStarLite.State;
+import dstarlite.State;
+import simulator.env.obstacles.Robot;
 
-public class VelocityPlanner_A_Star {
+public class AStarVelocityPlanner {
 	public int Dimensions;
 	public int[] DimensionSizes;
 	List<Robot> Robots;
@@ -24,7 +24,7 @@ public class VelocityPlanner_A_Star {
 	public Node Start;
 	public Node Goal;
 
-	public VelocityPlanner_A_Star(List<Robot> Robots) {
+	public AStarVelocityPlanner(List<Robot> Robots) {
 		this.Robots = Robots;
 		this.Paths = new ArrayList<List<State>>();
 	}
@@ -250,7 +250,7 @@ public class VelocityPlanner_A_Star {
 			Robot ri = Robots.get(r);
 			List<State> ripath = Paths.get(r);
 			State riState = ripath.get(location1[r]);
-			int cellSize = ri.Map.CellSize;
+			int cellSize = ri.Map.getCellSize();
 			int rix = riState.x * cellSize;
 			int riy = riState.y * cellSize;
 
