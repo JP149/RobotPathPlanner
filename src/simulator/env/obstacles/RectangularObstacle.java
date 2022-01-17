@@ -9,12 +9,14 @@ import java.awt.BasicStroke;
 import java.awt.Graphics2D;
 import java.awt.Point;
 
+import dstarlite.DStarLite;
+import simulator.Robot;
+
 public class RectangularObstacle extends EnvironmentObject {
 	public int XSpan;
 	public int YSpan;
 
-	public RectangularObstacle(Point currentLocation, int XSpan, int YSpan,
-			double velocity) {
+	public RectangularObstacle(Point currentLocation, int XSpan, int YSpan, double velocity) {
 		super(velocity, currentLocation);
 		this.XSpan = XSpan;
 		this.YSpan = YSpan;
@@ -22,10 +24,9 @@ public class RectangularObstacle extends EnvironmentObject {
 
 	@Override
 	public boolean isInObstacle(int x, int y) {
-		return x - this.Location.x <= XSpan / 2.0
-				&& y - this.Location.y <= YSpan / 2.0;
+		return x - this.Location.x <= XSpan / 2.0 && y - this.Location.y <= YSpan / 2.0;
 	}
-	
+
 	@Override
 	public boolean isInSensingRange(Point location, int sensingRange) {
 		// check if sensing range circle overlaps Rectangular Obstacle as
@@ -41,8 +42,7 @@ public class RectangularObstacle extends EnvironmentObject {
 	public void draw(Graphics2D g2d) {
 		Graphics2D g = (Graphics2D) g2d.create();
 		g.setColor(this.Color);
-		g.fillRect(this.Location.x - this.XSpan / 2, this.Location.y
-				- this.YSpan / 2, this.XSpan, this.YSpan);
+		g.fillRect(this.Location.x - this.XSpan / 2, this.Location.y - this.YSpan / 2, this.XSpan, this.YSpan);
 
 		// draw the Obstacle's Robot Detected status - shows color of the robots
 		// that have detected it
@@ -57,8 +57,23 @@ public class RectangularObstacle extends EnvironmentObject {
 																// between each
 																// color
 			int YSpan = this.YSpan + 2 * ((j + 1) * spacing);
-			g.drawRect(this.Location.x - XSpan / 2,
-					this.Location.y - YSpan / 2, XSpan, YSpan);
+			g.drawRect(this.Location.x - XSpan / 2, this.Location.y - YSpan / 2, XSpan, YSpan);
 		}
+	}
+	
+	@Override
+	public void updateCells(DStarLite dStarPathPlanner, int mapCellSize, Robot robot) {
+		// expand the Obstacle by the robot size
+		RectangularObstacle ro = new RectangularObstacle(this.Location, this.XSpan + 2 * robot.Radius,
+				this.YSpan + 2 * robot.Radius, +this.Velocity);
+		
+		// update blocked cells in the rectangle
+		int xOffset = ro.Location.x - ro.XSpan / 2;
+		int yOffset = ro.Location.y - ro.YSpan / 2;
+
+		for (int i = 0; i < ro.XSpan; i += mapCellSize)
+			for (int j = 0; j < ro.YSpan; j += mapCellSize)
+				if (ro.isInObstacle(xOffset + i, yOffset + j))
+					dStarPathPlanner.updateCell((xOffset + i) / mapCellSize, (yOffset + j) / mapCellSize, -1);
 	}
 }

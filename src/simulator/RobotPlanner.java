@@ -13,9 +13,8 @@ public class RobotPlanner {
 	public List<State> Path = new ArrayList<State>();
 	public List<State> RemainingPath;
 	public ArrayList<List<State>> previousPaths = new ArrayList<List<State>>();;
-	public boolean IsReplanning;
 	public ArrayList<EnvironmentObject> knownObstacles = new ArrayList<EnvironmentObject>();
-	public DStarLite PathPlanner;
+	public DStarLite DStarPathPlanner;
 	public Map Map;
 	public boolean DisplaySensingRange;
 	public boolean hasPlannedOnce;
@@ -25,7 +24,6 @@ public class RobotPlanner {
 
 	public RobotPlanner(boolean isReplanning, boolean displaySensingRange, boolean hasPlannedOnce, int pathIndex,
 			State currentState, Robot robot) {
-		IsReplanning = isReplanning;
 		DisplaySensingRange = displaySensingRange;
 		this.hasPlannedOnce = hasPlannedOnce;
 		this.pathIndex = pathIndex;
@@ -44,19 +42,18 @@ public class RobotPlanner {
 	public void replan() {
 		if (!hasPlannedOnce)
 			hasPlannedOnce = true;
-		IsReplanning = true;// trigger drawing of replan status
+		
 		long elapsed = System.currentTimeMillis();
-		PathPlanner.updateStart(currentState.x, currentState.y);
-		PathPlanner.replan();
+		DStarPathPlanner.updateStart(currentState.x, currentState.y);
+		DStarPathPlanner.replan();
 		if (this.Path.size() > 1)
 			previousPaths.add(this.Path);
-		this.Path = PathPlanner.getPath();
+		this.Path = DStarPathPlanner.getPath();
 		this.RemainingPath = this.Path;
 		pathIndex = 0;
 
-		elapsed -= System.currentTimeMillis();
+		elapsed = System.currentTimeMillis() - elapsed;
 		System.out.println("D*Lite Replan: " + elapsed + "ms");
-		IsReplanning = false;
 	}
 
 	public boolean processEnvironment(ArrayList<EnvironmentObject> environmentObjects) {
@@ -69,12 +66,12 @@ public class RobotPlanner {
 			boolean inSensingRange = eo.isInSensingRange(robot.Location, robot.SensingRange);
 
 			if (!knownObstacles.contains(eo) && inSensingRange)
-				replanNecessary = processKnownObject(eo);
+				replanNecessary = processNewKnownObject(eo);
 		}
 		return replanNecessary;
 	}
 
-	public boolean processKnownObject(EnvironmentObject eo) {
+	public boolean processNewKnownObject(EnvironmentObject eo) {
 		boolean replanRequired = false;
 		
 		if (knownObstacles.contains(eo))
@@ -94,35 +91,8 @@ public class RobotPlanner {
 
 	private void updateCells(EnvironmentObject eo) {
 		int mapCellSize = Map.getCellSize();
-
-		if (eo instanceof RectangularObstacle) {
-			RectangularObstacle ro = (RectangularObstacle) eo;
-			// expand the Obstacle by the robot size
-			ro = new RectangularObstacle(ro.Location, ro.XSpan + 2 * this.robot.Radius,
-					ro.YSpan + 2 * this.robot.Radius, +ro.Velocity);
-			// update blocked cells in the rectangle
-			int xOffset = ro.Location.x - ro.XSpan / 2;
-			int yOffset = ro.Location.y - ro.YSpan / 2;
-
-			for (int i = 0; i < ro.XSpan; i += mapCellSize)
-				for (int j = 0; j < ro.YSpan; j += mapCellSize)
-					if (ro.isInObstacle(xOffset + i, yOffset + j))
-						PathPlanner.updateCell((xOffset + i) / mapCellSize, (yOffset + j) / mapCellSize, -1);
-
-		} else if (eo instanceof CircularObstacle) {
-			CircularObstacle co = (CircularObstacle) eo;
-			// expand the Obstacle by the robot size
-			co = new CircularObstacle(co.Location, co.Radius + this.robot.Radius, co.Velocity);
-			// update blocked cells in the Circle
-			int xOffset = co.Location.x - co.Radius;
-			int yOffset = co.Location.y - co.Radius;
-			for (int i = 0; i < 2 * co.Radius; i += mapCellSize)
-				for (int j = 0; j < 2 * co.Radius; j += mapCellSize)
-					if (co.isInObstacle(xOffset + i, yOffset + j))
-						PathPlanner.updateCell((xOffset + i) / mapCellSize, (yOffset + j) / mapCellSize, -1);
-		} else {// Point Obstacle
-			PathPlanner.updateCell(eo.Location.x / mapCellSize, eo.Location.y / mapCellSize, -1);
-		}
+		
+		eo.updateCells(DStarPathPlanner, mapCellSize, robot);
 	}
 
 	public boolean canCollide(int thisrx, int thisry, int thatx, int thaty, int leeway) {
@@ -153,7 +123,11 @@ public class RobotPlanner {
 	}
 
 	public List<State> getRemainingPath() {
-		int startIndex = this.pathIndex >= this.RemainingPath.size() ? this.RemainingPath.size() - 1 : this.pathIndex;
+		int startIndex = this.pathIndex;
+		
+		if(startIndex >= this.RemainingPath.size())
+			startIndex = this.RemainingPath.size()-1;
+		
 		int endIndex = this.RemainingPath.size();
 		return this.RemainingPath.subList(startIndex, endIndex);
 	}

@@ -42,11 +42,11 @@ public class Robot extends EnvironmentObject {
 		this.robotPlanner.Map = map;
 		
 		//setup the planner
-		robotPlanner.PathPlanner = new DStarLite();
+		robotPlanner.DStarPathPlanner = new DStarLite();
 		robotPlanner.currentState = new State();
 		robotPlanner.currentState.x = Start.x / robotPlanner.Map.getCellSize();
 		robotPlanner.currentState.y = Start.y / robotPlanner.Map.getCellSize();
-		robotPlanner.PathPlanner.init(robotPlanner.currentState.x, robotPlanner.currentState.y, Goal.x / robotPlanner.Map.getCellSize(), Goal.y / robotPlanner.Map.getCellSize());
+		robotPlanner.DStarPathPlanner.init(robotPlanner.currentState.x, robotPlanner.currentState.y, Goal.x / robotPlanner.Map.getCellSize(), Goal.y / robotPlanner.Map.getCellSize());
 
 		this.robotPlanner.Path = new ArrayList<State>();
 		this.robotPlanner.previousPaths = new ArrayList<List<State>>();

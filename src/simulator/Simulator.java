@@ -92,7 +92,6 @@ public class Simulator extends JPanel {
 			planAllRobots();
 			VelocityProfile = VelocityPlanner.replan();
 			velocityProfiled = true;
-			printVelocityProfile();
 			currentNodeIndex = 0;
 			stepCurrentNodeTo(currentNodeIndex);
 			return;
@@ -104,21 +103,10 @@ public class Simulator extends JPanel {
 			if (robotReplanned) {// now Velocity replan
 				VelocityProfile = VelocityPlanner.replan();
 				velocityProfiled = true;
-				printVelocityProfile();
 				System.out.println("Robot " + r.Label + "\tReplanned");
 				currentNodeIndex = 0;
 				stepCurrentNodeTo(currentNodeIndex);
 			}
-		}
-	}
-
-	private void printVelocityProfile() {
-		int i = 0;
-		for (Node n : VelocityProfile) {
-			System.out.print("Node " + (++i) + "\t");
-			for (int l : n.NodeInfo.Location)
-				System.out.print(l + "\t");
-			System.out.println("");
 		}
 	}
 
