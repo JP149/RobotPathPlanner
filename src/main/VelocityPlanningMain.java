@@ -11,10 +11,10 @@ import java.awt.Point;
 import javax.swing.JFrame;
 
 import main.factory.SimulatorFactory;
+import simulator.Robot;
 import simulator.Simulator;
 import simulator.env.obstacles.CircularObstacle;
 import simulator.env.obstacles.RectangularObstacle;
-import simulator.env.obstacles.Robot;
 
 public class VelocityPlanningMain {
 

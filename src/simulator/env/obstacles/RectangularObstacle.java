@@ -25,6 +25,17 @@ public class RectangularObstacle extends EnvironmentObject {
 		return x - this.Location.x <= XSpan / 2.0
 				&& y - this.Location.y <= YSpan / 2.0;
 	}
+	
+	@Override
+	public boolean isInSensingRange(Point location, int sensingRange) {
+		// check if sensing range circle overlaps Rectangular Obstacle as
+		// approximated by circle inscribed rectangle
+		// approximation should suffice assuming the rectangle is smaller
+		// than the sensing range
+		double inscribedRectRadius = Math.sqrt(Math.pow(this.XSpan, 2) + Math.pow(this.YSpan, 2)) / 2.0;
+		double centerDistance = location.distance(this.Location);
+		return centerDistance < sensingRange + inscribedRectRadius;
+	}
 
 	@Override
 	public void draw(Graphics2D g2d) {

@@ -6,8 +6,8 @@ import org.apache.commons.math3.ode.sampling.StepInterpolator;
 import org.apache.commons.math3.ode.sampling.StepHandler;
 
 import dstarlite.State;
+import simulator.Robot;
 import simulator.Simulator;
-import simulator.env.obstacles.Robot;
 
 public class FormationStepHandler implements StepHandler {
 	
@@ -41,7 +41,7 @@ public class FormationStepHandler implements StepHandler {
 					+ d[2 * i + 1] * Math.cos(t) + E[2 * i];
 			double y = Math.sin(t) + d[2 * i] * Math.cos(t)
 					+ d[2 * i + 1] * Math.sin(t) + E[2 * i + 1];
-			r.stepTo(new State((int) (x * 100) + 150,
+			r.robotPlanner.stepTo(new State((int) (x * 100) + 150,
 					(int) (y * 100) + 150, null));// map -1.5,1.5 to
 													// 0,300
 		}

@@ -23,6 +23,12 @@ public class CircularObstacle extends EnvironmentObject {
 		return Math.pow(x - this.Location.x, 2)
 				+ Math.pow(y - this.Location.y, 2) <= Math.pow(Radius, 2);
 	}
+	
+	@Override
+	public boolean isInSensingRange(Point location, int sensingRange) {
+		double centerDistance = location.distance(this.Location);
+		return centerDistance < sensingRange + this.Radius;
+	}
 
 	@Override
 	public void draw(Graphics2D g2d) {

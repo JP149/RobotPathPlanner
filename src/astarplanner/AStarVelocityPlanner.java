@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.PriorityQueue;
 
 import dstarlite.State;
-import simulator.env.obstacles.Robot;
+import simulator.Robot;
 
 public class AStarVelocityPlanner {
 	public int Dimensions;
@@ -34,8 +34,8 @@ public class AStarVelocityPlanner {
 
 		for (int i = 0; i < Robots.size(); i++) {
 			Robot r = Robots.get(i);
-			List<State> subPath = r.getRemainingPath();
-			r.RemainingPath = subPath;
+			List<State> subPath = r.robotPlanner.getRemainingPath();
+			r.robotPlanner.RemainingPath = subPath;
 			this.Paths.add(subPath);
 			if (r.Radius > Leeway)
 				Leeway = r.Radius;
@@ -250,7 +250,7 @@ public class AStarVelocityPlanner {
 			Robot ri = Robots.get(r);
 			List<State> ripath = Paths.get(r);
 			State riState = ripath.get(location1[r]);
-			int cellSize = ri.Map.getCellSize();
+			int cellSize = ri.robotPlanner.Map.getCellSize();
 			int rix = riState.x * cellSize;
 			int riy = riState.y * cellSize;
 
@@ -262,7 +262,7 @@ public class AStarVelocityPlanner {
 				int stateIndex = location1[rj];
 				State rjState = rjpath.get(stateIndex);// get robots
 														// state
-				if (ri.canCollide(rix, riy, rjState.x * cellSize, rjState.y
+				if (ri.robotPlanner.canCollide(rix, riy, rjState.x * cellSize, rjState.y
 						* cellSize, leeway))
 					return true;
 			}

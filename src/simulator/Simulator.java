@@ -13,7 +13,6 @@ import java.util.List;
 import javax.swing.JPanel;
 
 import astarplanner.Node;
-import simulator.env.obstacles.Robot;
 import astarplanner.AStarVelocityPlanner;
 
 @SuppressWarnings("serial")
@@ -76,8 +75,8 @@ public class Simulator extends JPanel {
 
 	private void stepRobot() {
 		for (Robot robot : map.getRobots()) {
-			robot.checkReplan(map.getObstacles());
-			robot.step();
+			robot.robotPlanner.checkReplan(map.getObstacles());
+			robot.robotPlanner.step();
 		}
 	}
 
@@ -101,7 +100,7 @@ public class Simulator extends JPanel {
 		// check if replanning is required
 		
 		for (Robot r : map.getRobots()) {
-			boolean robotReplanned = r.checkReplan(map.getObstacles());
+			boolean robotReplanned = r.robotPlanner.checkReplan(map.getObstacles());
 			if (robotReplanned) {// now Velocity replan
 				VelocityProfile = VelocityPlanner.replan();
 				velocityProfiled = true;
@@ -125,12 +124,12 @@ public class Simulator extends JPanel {
 
 	private void planAllRobots() {
 		for (Robot r : map.getRobots())
-			r.replan();
+			r.robotPlanner.replan();
 	}
 
 	private boolean plannedAtLeastOnce(List<Robot> robots) {
 		for (Robot r : robots)
-			if (!r.hasPlannedOnce)
+			if (!r.robotPlanner.hasPlannedOnce)
 				return false;
 		return true;
 	}
@@ -142,7 +141,7 @@ public class Simulator extends JPanel {
 			return;
 		currentNode = VelocityProfile.get(nextIndex);
 		for (Robot r : map.getRobots())
-			r.stepTo(currentNode.NodeInfo.Location[VelocityPlanner.getIndex(r)]);
+			r.robotPlanner.stepTo(currentNode.NodeInfo.Location[VelocityPlanner.getIndex(r)]);
 	}
 
 	public void run() {

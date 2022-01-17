@@ -23,6 +23,18 @@ public abstract class EnvironmentObject implements IObstacle {
 		this.Color = java.awt.Color.gray;
 		KnownByRobotColors = new ArrayList<Color>();
 	}
+	
+	public void registerRobot(Color robotColor)
+	{
+		if (!KnownByRobotColors.contains(robotColor))
+			KnownByRobotColors.add(robotColor);
+	}
+	
+	public boolean isInSensingRange(Point location, int sensingRange)
+	{
+		// assume point obstacle check if point is within the sensing range circle
+		return location.distance(this.Location) <= sensingRange;
+	}
 
 	public abstract void draw(Graphics2D g);
 }

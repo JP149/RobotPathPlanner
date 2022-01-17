@@ -4,10 +4,10 @@ import java.awt.Color;
 import java.awt.Point;
 
 import formationsimulation.FormationSimulator;
+import simulator.Robot;
 import simulator.Simulator;
 import simulator.env.obstacles.CircularObstacle;
 import simulator.env.obstacles.RectangularObstacle;
-import simulator.env.obstacles.Robot;
 
 public class SimulatorFactory {
 	
@@ -167,7 +167,7 @@ public class SimulatorFactory {
 		sim.map.addObstacle(r5);
 		
 		for (Robot r : sim.map.getRobots()) {
-			r.DisplaySensingRange = false;
+			r.robotPlanner.DisplaySensingRange = false;
 			r.Radius = 10;
 		}
 		

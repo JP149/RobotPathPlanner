@@ -8,7 +8,6 @@ package simulator;
 import java.util.ArrayList;
 
 import simulator.env.obstacles.EnvironmentObject;
-import simulator.env.obstacles.Robot;
 
 public class Map {
 	private int width;
